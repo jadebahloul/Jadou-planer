@@ -1,0 +1,218 @@
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/cormorant-garamond/400-italic.css';
+@import '@fontsource/cormorant-garamond/500-italic.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ themes */
+:root,
+[data-theme='rose'] {
+  --canvas: 250 248 246; /* #FAF8F6 blanc cassé */
+  --surface: 255 255 255;
+  --sunken: 245 240 236;
+  --ink: 41 37 39; /* #292527 */
+  --muted: 139 129 133; /* #8B8185 */
+  --line: 237 229 221; /* #EDE5DD beige */
+  --wine: 113 63 75; /* #713F4B bordeaux */
+  --wine-soft: 145 92 105;
+  --blush: 235 203 208; /* #EBCBD0 rose poudré */
+  --petal: 247 233 236; /* #F7E9EC rose très clair */
+  --sand: 237 229 221;
+  --onwine: 255 255 255;
+  --good: 63 143 95;
+  --warn: 183 121 31;
+  --bad: 180 65 60;
+  --chart-1: #8a3b55;
+  --chart-2: #008f80;
+  --chart-3: #c08a1c;
+  --chart-4: #4e79c4;
+  --chart-5: #e07a9a;
+  --chart-6: #6e8a1e;
+  --grain-opacity: 0.35;
+  color-scheme: light;
+}
+
+[data-theme='champagne'] {
+  --canvas: 249 246 240;
+  --sunken: 242 236 226;
+  --line: 233 224 210;
+  --wine: 125 84 52;
+  --wine-soft: 156 116 80;
+  --blush: 232 214 190;
+  --petal: 246 238 226;
+  --sand: 233 224 210;
+}
+
+[data-theme='nuit'] {
+  --canvas: 24 21 23;
+  --surface: 35 31 34;
+  --sunken: 30 26 29;
+  --ink: 244 238 240;
+  --muted: 170 158 163;
+  --line: 58 51 56;
+  --wine: 226 160 178;
+  --wine-soft: 196 128 148;
+  --blush: 120 70 84;
+  --petal: 52 40 46;
+  --sand: 58 51 56;
+  --onwine: 35 22 28;
+  --good: 110 196 140;
+  --warn: 226 170 80;
+  --bad: 236 120 112;
+  --chart-1: #d0688d;
+  --chart-2: #12a2d0;
+  --chart-3: #be8a22;
+  --chart-4: #6a7fe0;
+  --chart-5: #d06e9a;
+  --chart-6: #8c9e36;
+  --grain-opacity: 0.12;
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ base */
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  @apply bg-canvas font-sans text-ink antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-tap-highlight-color: transparent;
+}
+::selection {
+  background: rgb(var(--blush));
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--line)) transparent;
+}
+
+@layer components {
+  .h-display {
+    @apply font-display font-medium tracking-[-0.01em] text-ink;
+  }
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-muted;
+  }
+  .card {
+    @apply rounded-2xl border border-line/80 bg-surface shadow-card;
+  }
+  .card-hover {
+    @apply transition duration-300 hover:-translate-y-0.5 hover:shadow-lift;
+  }
+  .field {
+    @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition placeholder:text-muted/70 focus:border-wine/40 focus:shadow-ring;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-muted transition hover:border-wine/30 hover:text-ink;
+  }
+  .chip-active {
+    @apply border-wine bg-wine text-onwine hover:text-onwine;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* soft paper grain used on covers */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .44 0 0 0 0 .25 0 0 0 0 .29 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* markdown-ish assistant text */
+.prose-jadou strong {
+  @apply font-semibold text-ink;
+}
+
+/* ------------------------------------------------------------------ FullCalendar */
+.fc {
+  --fc-border-color: rgb(var(--line));
+  --fc-today-bg-color: rgb(var(--petal) / 0.6);
+  --fc-page-bg-color: rgb(var(--surface));
+  --fc-neutral-bg-color: rgb(var(--sunken));
+  --fc-list-event-hover-bg-color: rgb(var(--petal));
+  --fc-event-border-color: transparent;
+  --fc-now-indicator-color: rgb(var(--wine));
+  font-size: 0.8rem;
+}
+.fc .fc-toolbar {
+  display: none;
+}
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number {
+  @apply px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted no-underline;
+}
+.fc .fc-day-today .fc-daygrid-day-number {
+  @apply m-1 rounded-full bg-wine px-2 text-onwine;
+}
+.fc .fc-timegrid-slot {
+  height: 2.6em;
+}
+.fc .fc-timegrid-slot-label-cushion {
+  @apply text-[10px] text-muted;
+}
+.fc .fc-event {
+  @apply cursor-pointer rounded-lg border-0 shadow-none;
+}
+.fc .fc-event .fc-event-main {
+  @apply px-1.5 py-0.5;
+}
+.fc .fc-daygrid-event {
+  @apply mx-1 my-px;
+}
+.fc .fc-list {
+  @apply rounded-2xl border-0;
+}
+.fc .fc-list-day-cushion {
+  @apply bg-sunken;
+}
+.fc .fc-scrollgrid {
+  @apply rounded-2xl;
+}
+.fc-theme-standard .fc-scrollgrid {
+  border: 1px solid rgb(var(--line));
+}
+.fc .fc-highlight {
+  background: rgb(var(--blush) / 0.35);
+}
+
+/* print (PDF export of reviews) */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  .card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.font-display,
+.h-display {
+  font-variant-numeric: lining-nums;
+  font-feature-settings: 'lnum' 1;
+}

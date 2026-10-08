@@ -1,0 +1,1 @@
+{ "name": "Jadou Planner", "short_name": "Jadou", "start_url": "/", "display": "standalone", "background_color": "#FAF8F6", "theme_color": "#713F4B", "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }] }
