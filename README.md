@@ -8,6 +8,14 @@
 
 ## 1. Démarrage rapide
 
+**Le plus simple :** télécharge le projet (bouton vert « Code » › « Download ZIP » sur GitHub, puis dézippe), installe [Node.js LTS](https://nodejs.org), et double-clique sur :
+- **Mac** : `Lancer Jadou Planner (Mac).command` (au premier lancement : clic droit › Ouvrir si macOS bloque le fichier)
+- **Windows** : `Lancer Jadou Planner (Windows).bat`
+
+La première fois, l'installation prend quelques minutes, puis le navigateur s'ouvre sur **http://localhost:4317**. Laisse la fenêtre du terminal ouverte tant que tu utilises l'application.
+
+**En ligne de commande :**
+
 Prérequis : **Node.js 20+** (testé avec Node 22).
 
 ```bash
