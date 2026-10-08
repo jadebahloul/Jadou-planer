@@ -290,8 +290,8 @@ export function parseCapture(input: string, ref = todayFn()): CaptureProposal {
   }
 
   // --- homework
-  if (/\b(devoir|dossier a rendre|expose|a rendre|rendu)\b/.test(n)) {
-    const title = cleanTitle(rest, [/\b(ajoute|un|une|le|la)\b/gi, /\bdevoirs?\b/gi, /a rendre/gi, /pour\s*$/gi]);
+  if (/\b(devoir|dossier a rendre|expose|a rendre|rendu)\b|^rendre\b|\brendre (le|la|les|mon|ma|mes) /.test(n)) {
+    const title = cleanTitle(rest, [/^\s*rendre\s+(le|la|les|mon|ma|mes)?\s*/i, /\b(ajoute|un|une)\b/gi, /\bdevoirs?\b/gi, /à rendre|a rendre/gi, /\s(pour|le)\s*$/gi]);
     return {
       resource: 'homework',
       data: { title: title || 'Devoir', dueDate: ex.date ?? addDays(ref, 7), dueTime: ex.time ?? null, priority: 'high', status: 'todo' },

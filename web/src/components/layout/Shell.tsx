@@ -204,11 +204,11 @@ export function Shell() {
 
       {/* Ask Jadou AI floating button + drawer */}
       {!loc.pathname.startsWith('/ai') && (
-        <button onClick={() => setAiOpen(true)} className="no-print fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full border border-wine/10 bg-surface/95 py-2.5 pl-3 pr-4 text-sm font-medium text-wine shadow-lift backdrop-blur transition hover:-translate-y-0.5 lg:bottom-6 lg:right-6">
+        <button onClick={() => setAiOpen(true)} className="no-print fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full border border-wine/10 bg-surface/95 p-2 sm:py-2.5 sm:pl-3 sm:pr-4 text-sm font-medium text-wine shadow-lift backdrop-blur transition hover:-translate-y-0.5 lg:bottom-6 lg:right-6">
           <span className="grid h-7 w-7 place-items-center rounded-full bg-wine text-onwine">
             <Sparkles className="h-3.5 w-3.5" />
           </span>
-          Ask Jadou AI ♡
+          <span className="hidden sm:inline">Ask Jadou AI ♡</span>
         </button>
       )}
       <Dialog.Root open={aiOpen} onOpenChange={setAiOpen}>

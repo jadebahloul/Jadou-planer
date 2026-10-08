@@ -67,7 +67,8 @@ function Hero({ stats, agenda }: { stats: any; agenda: CalItem[] }) {
   const photo = settings?.theme?.headerPhoto as string | undefined;
   const nick = settings?.profile?.nickname || 'Jadou';
   const nowStr = `${today()}T${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-  const next = agenda.find((i) => !i.allDay && i.start >= nowStr && i.start.slice(0, 10) === today()) ?? agenda.find((i) => i.start >= nowStr);
+  const upcoming = agenda.filter((i) => i.status !== 'done' && i.source !== 'task');
+  const next = upcoming.find((i) => !i.allDay && i.start >= nowStr && i.start.slice(0, 10) === today()) ?? upcoming.find((i) => i.start >= nowStr);
   return (
     <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="relative mb-6 overflow-hidden rounded-[32px] border border-line/70">
       {photo ? (

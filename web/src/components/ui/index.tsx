@@ -128,7 +128,7 @@ export function Stat({ label, value, sub, icon: Icon, accent, className }: { lab
   return (
     <Card className={cn('p-4 sm:p-5', accent && 'border-transparent bg-wine text-onwine', className)}>
       <div className="flex items-center justify-between">
-        <span className={cn('eyebrow', accent && 'text-onwine/70')}>{label}</span>
+        <span className={cn('eyebrow truncate', accent && 'text-onwine/70')} title={label}>{label}</span>
         {Icon && <Icon className={cn('h-4 w-4 text-muted', accent && 'text-onwine/70')} strokeWidth={1.7} />}
       </div>
       <div className={cn('num mt-2 font-display text-[28px] font-medium leading-none sm:text-[32px]', accent ? 'text-onwine' : 'text-ink')}>{value}</div>
@@ -150,7 +150,7 @@ export function Modal({ open, onOpenChange, title, description, children, size =
         <Dialog.Content
           className={cn(
             'fixed inset-x-0 bottom-0 z-50 flex max-h-[92dvh] flex-col rounded-t-3xl border border-line bg-surface shadow-lift outline-none sm:inset-auto sm:left-1/2 sm:top-1/2 sm:max-h-[86vh] sm:w-[calc(100%-2rem)] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-3xl',
-            'data-[state=open]:animate-fade-up',
+            'data-[state=open]:animate-pop',
             size === 'sm' && 'sm:max-w-md',
             size === 'md' && 'sm:max-w-xl',
             size === 'lg' && 'sm:max-w-3xl',

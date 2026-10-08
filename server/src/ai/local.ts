@@ -88,6 +88,42 @@ const organizeDay: Handler = async (_m, n) => {
   return reply(`${head}**Proposition pour ${ref === today() ? 'aujourd’hui' : 'demain'}**\n${lines.join('\n')}\n\nValide pour enregistrer les horaires dans My Tasks et My Calendar.`, actions);
 };
 
+const organizeWeek: Handler = async (_m, n) => {
+  if (!/(organis|planifi|prepare).*(semaine)|planning de (la|ma) semaine/.test(n)) return null;
+  const ref = today();
+  const open = await prisma.task.findMany({ where: { status: { not: 'done' }, time: null, OR: [{ date: { lte: addDays(ref, 6) } }, { date: null }] } });
+  if (!open.length) return reply('Toutes tes tâches de la semaine ont déjà un horaire (ou il n’y en a pas). Ta semaine est prête ✨');
+  const sorted = open.sort((a, b) => (PRIO_RANK[a.priority ?? 'medium'] ?? 2) - (PRIO_RANK[b.priority ?? 'medium'] ?? 2) || String(a.date ?? '9999').localeCompare(String(b.date ?? '9999')));
+  const actions: AiAction[] = [];
+  const lines: string[] = [];
+  const pools: Record<string, { cur: number; end: number }[]> = {};
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(ref, i);
+    pools[d] = (await freeSlots(d, 20, '08:30', '21:00')).map((x) => ({ cur: timeToMinutes(x.start), end: timeToMinutes(x.end) }));
+  }
+  const load: Record<string, number> = {};
+  for (const t of sorted) {
+    const dur = t.durationMin || 45;
+    // keep the planned day when possible, otherwise the least loaded day before the deadline
+    const candidates = Object.keys(pools).filter((d) => !t.date || t.date < ref || d <= t.date);
+    const preferred = t.date && t.date >= ref ? [t.date, ...candidates.filter((d) => d !== t.date)] : candidates.sort((a, b) => (load[a] ?? 0) - (load[b] ?? 0));
+    let placed = false;
+    for (const d of preferred) {
+      const slot = pools[d]?.find((p) => p.end - p.cur >= dur);
+      if (!slot) continue;
+      const time = minutesToTime(slot.cur);
+      slot.cur += dur + 10;
+      load[d] = (load[d] ?? 0) + dur;
+      lines.push(`• ${formatFr(d, { weekday: true })} **${time}** — ${t.title}`);
+      actions.push({ op: 'update', resource: 'task', id: t.id, data: { date: d, time }, summary: `${formatFr(d, { weekday: true })} ${time} · ${t.title}` });
+      placed = true;
+      break;
+    }
+    if (!placed) lines.push(`• ${t.title} — pas de créneau libre cette semaine`);
+  }
+  return reply(`**Proposition de planning pour les 7 prochains jours** (autour de tes cours, alternance, RDV et séances) :\n${lines.join('\n')}\n\nValide les créneaux qui te conviennent.`, actions);
+};
+
 const homework: Handler = async (_m, n) => {
   if (!/devoir|a rendre|rendus?\b/.test(n) || /ajoute|cree|nouveau/.test(n)) return null;
   const s = await studiesSummary();
@@ -292,7 +328,7 @@ const capture: Handler = async (m, n) => {
   return reply(`Voici ce que je propose d’enregistrer :`, [{ op: 'create', resource: p.resource, data: p.data, summary: p.summary, hints: p.hints }]);
 };
 
-const HANDLERS: Handler[] = [memoryIntent, organizeDay, toeicPlanIntent, sportSlots, priorities, homework, financialReview, lashRevenue, airbnbReview, balances, saved, bestActivity, wishlistQ, tripChecklist, weeklyReview, instagramIdeas, capture];
+const HANDLERS: Handler[] = [memoryIntent, organizeWeek, organizeDay, toeicPlanIntent, sportSlots, priorities, homework, financialReview, lashRevenue, airbnbReview, balances, saved, bestActivity, wishlistQ, tripChecklist, weeklyReview, instagramIdeas, capture];
 
 export async function localAnswer(message: string): Promise<AiReply | null> {
   const n = normalize(message.trim());
@@ -306,7 +342,7 @@ export async function localAnswer(message: string): Promise<AiReply | null> {
 export const LOCAL_HELP = `Je fonctionne en **mode local** (sans modèle d’IA) : je comprends les demandes courantes et je calcule tout à partir de tes vraies données.
 
 Essaie par exemple :
-• « Quelles sont mes priorités ? » · « Organise-moi ma journée »
+• « Quelles sont mes priorités ? » · « Organise-moi ma journée » · « Organise ma semaine »
 • « Quels devoirs dois-je rendre ? » · « Programme mes révisions TOEIC »
 • « Trouve-moi deux créneaux pour le sport »
 • « Combien ai-je sur mes comptes ? » · « Fais-moi mon bilan financier »

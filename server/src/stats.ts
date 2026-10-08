@@ -257,3 +257,51 @@ export async function airbnbSummary(ref = today()) {
     upcoming: bookings.filter((b) => b.checkIn! >= ref).sort((a, b) => a.checkIn!.localeCompare(b.checkIn!)).slice(0, 5),
   };
 }
+
+/** Aggregated activity between two dates (inclusive) — used by reviews & Life Analytics. */
+export async function periodSummary(from: string, to: string) {
+  const fromTs = new Date(`${from}T00:00:00`);
+  const toTs = new Date(`${to}T23:59:59`);
+  const tasksDone = await prisma.task.findMany({ where: { status: 'done', completedAt: { gte: fromTs.toISOString(), lte: toTs.toISOString() } } });
+  const focus = await prisma.focusSession.findMany({ where: { date: { gte: from, lte: to } } });
+  const attempts = await prisma.toeicAttempt.findMany({ where: { date: { gte: from, lte: to } } });
+  const workouts = await prisma.workoutSession.findMany({ where: { status: 'done', date: { gte: from, lte: to } } });
+  const txs = await prisma.transaction.findMany({ where: { date: { gte: from, lte: to } } });
+  const contribs = await prisma.savingsContribution.findMany({ where: { date: { gte: from, lte: to } } });
+  const goalsDone = await prisma.goal.findMany({ where: { status: 'done', updatedAt: { gte: fromTs, lte: toTs } } });
+  const lash = await prisma.lashAppointment.findMany({ where: { status: 'done', start: { gte: from, lte: `${to}T23:59` } } });
+  const ideas = await prisma.businessIdea.count({ where: { updatedAt: { gte: fromTs, lte: toTs } } });
+  const thesis = await prisma.thesisItem.count({ where: { updatedAt: { gte: fromTs, lte: toTs } } });
+  const projects = await prisma.groupProject.count({ where: { updatedAt: { gte: fromTs, lte: toTs } } });
+  const homeworkDone = await prisma.homework.count({ where: { status: 'done', updatedAt: { gte: fromTs, lte: toTs } } });
+  const journal = await prisma.journalEntry.count({ where: { date: { gte: from, lte: to } } });
+  const habitLogs = await prisma.habitLog.count({ where: { date: { gte: from, lte: to } } });
+  const flows = flowTotals(txs.map((t) => ({ ...t, amount: t.amount ?? 0, accountId: t.accountId!, date: t.date! })));
+  const byCat: Record<string, number> = {};
+  for (const t of tasksDone) byCat[t.category ?? 'perso'] = (byCat[t.category ?? 'perso'] ?? 0) + 1;
+  const studyMinutes = focus.filter((f) => ['cours', 'devoirs', 'toeic'].includes(f.category ?? '')).reduce((s, f) => s + (f.minutes ?? 0), 0);
+  return {
+    from,
+    to,
+    tasksDone: tasksDone.length,
+    tasksByCategory: byCat,
+    topTasks: tasksDone.filter((t) => t.priority === 'high' || t.priority === 'urgent' || t.focus).slice(0, 8).map((t) => t.title),
+    focusMinutes: focus.reduce((s, f) => s + (f.minutes ?? 0), 0),
+    studyMinutes,
+    toeicAttempts: attempts.length,
+    toeicMinutes: Math.round(attempts.reduce((s, a) => s + (a.durationSec ?? 0), 0) / 60) + focus.filter((f) => f.category === 'toeic').reduce((s, f) => s + (f.minutes ?? 0), 0),
+    toeicAccuracy: attempts.length ? Math.round((attempts.reduce((s, a) => s + (a.score ?? 0), 0) / Math.max(1, attempts.reduce((s, a) => s + (a.total ?? 0), 0))) * 100) : null,
+    workouts: workouts.length,
+    income: flows.income,
+    expense: flows.expense,
+    net: flows.net,
+    saved: round2(contribs.reduce((s, c) => s + (c.amount ?? 0), 0)),
+    lashRevenue: round2(lash.reduce((s, a) => s + (a.price ?? 0), 0)),
+    lashCount: lash.length,
+    goalsDone: goalsDone.map((g) => g.title),
+    projectsUpdated: ideas + thesis + projects,
+    homeworkDone,
+    journal,
+    habitLogs,
+  };
+}

@@ -34,9 +34,10 @@ export default {
       },
       keyframes: {
         'fade-up': { from: { opacity: 0, transform: 'translateY(6px)' }, to: { opacity: 1, transform: 'none' } },
+        pop: { from: { opacity: 0, scale: '0.97' }, to: { opacity: 1, scale: '1' } },
         shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
       },
-      animation: { 'fade-up': 'fade-up .45s cubic-bezier(.2,.7,.2,1) both', shimmer: 'shimmer 1.6s linear infinite' },
+      animation: { pop: 'pop .22s cubic-bezier(.2,.7,.2,1) both', 'fade-up': 'fade-up .45s cubic-bezier(.2,.7,.2,1) both', shimmer: 'shimmer 1.6s linear infinite' },
     },
   },
   plugins: [],

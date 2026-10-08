@@ -31,6 +31,7 @@ function checkActions(actions: AiAction[]): AiAction[] {
     try {
       const data = { ...(a.data ?? {}) };
       if (a.resource === 'lashAppointment' && !data.clientId) data.clientId = 0; // resolved from hints at execution
+      if (a.resource === 'transaction' && !data.accountId) data.accountId = 0; // default account at execution
       validateInput(a.resource, data, a.op === 'update');
       ok.push({ ...a, summary: String(a.summary ?? '').slice(0, 200) });
     } catch (e) {
@@ -67,8 +68,14 @@ aiRouter.post('/chat', async (req, res, next) => {
   }
 });
 
+async function defaultAccountId() {
+  const acc = (await prisma.bankAccount.findFirst({ where: { archived: { not: true }, type: 'current' } })) ?? (await prisma.bankAccount.findFirst({ where: { archived: { not: true } } }));
+  return acc?.id ?? null;
+}
+
 async function resolveHints(a: AiAction) {
   const data = { ...a.data };
+  if (a.resource === 'transaction' && !data.accountId) data.accountId = await defaultAccountId();
   if (a.resource === 'lashAppointment') {
     const name = a.hints?.clientName?.trim();
     if (!data.clientId) {
@@ -121,7 +128,9 @@ async function markAction(messageId: number, index: number, state: string) {
 aiRouter.post('/capture', async (req, res) => {
   const text = String(req.body?.text ?? '').trim();
   if (!text) return res.status(400).json({ error: 'Texte vide' });
-  res.json(parseCapture(text));
+  const p = parseCapture(text);
+  if (p.resource === 'transaction' && !p.data.accountId) p.data.accountId = await defaultAccountId();
+  res.json(p);
 });
 
 aiRouter.post('/capture/save', async (req, res, next) => {

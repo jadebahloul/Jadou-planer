@@ -47,7 +47,7 @@ export function TaskCheck({ task, onToggled, showDate, className }: { task: Row;
           )}
         </div>
       </div>
-      {(task.priority === 'high' || task.priority === 'urgent') && !done && <Badge color={PRIORITIES.find((p) => p.value === task.priority)?.color}>{optionLabel(PRIORITIES, task.priority)}</Badge>}
+      {(task.priority === 'high' || task.priority === 'urgent') && !done && <Badge className="hidden sm:inline-flex" color={PRIORITIES.find((p) => p.value === task.priority)?.color}>{optionLabel(PRIORITIES, task.priority)}</Badge>}
     </div>
   );
 }

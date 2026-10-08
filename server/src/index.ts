@@ -49,7 +49,6 @@ app.get('/api/auth/status', async (req, res) => {
 app.post('/api/auth/setup', async (req, res, next) => {
   try {
     await setup(req, res);
-    if (res.statusCode === 200) await seedIfNeeded();
   } catch (e) {
     next(e);
   }
@@ -117,6 +116,15 @@ for (const [name, fn] of Object.entries({ lash: stats.lashSummary, fitness: stat
     }
   });
 }
+app.get('/api/stats/period', async (req, res, next) => {
+  try {
+    const from = ref(req.query.from);
+    const to = ref(req.query.to);
+    res.json(await stats.periodSummary(from, to));
+  } catch (e) {
+    next(e);
+  }
+});
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use(errorHandler);
 

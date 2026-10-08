@@ -100,7 +100,7 @@ export function LashPage() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <Stat label="CA aujourd’hui" value={eur(s.today)} icon={Gem} accent />
             <Stat label="CA semaine" value={eur(s.week)} />
-            <Stat label="CA du mois" value={eur(s.month)} sub={`${s.monthCount} prestations`} />
+            <Stat label="CA du mois" value={eur(s.month)} sub={`${s.monthCount} prestation${s.monthCount > 1 ? 's' : ''}`} />
             <Stat label="Panier moyen" value={eur(s.avgBasket)} />
             <Stat label="Clientes" value={s.clientsCount} sub={`${s.clientsThisMonth} ce mois`} icon={Users} />
             <Stat label="Dépenses du mois" value={eur(s.consumables + s.expenses)} sub={`consommables ${eur(s.consumables)} · matériel ${eur(s.expenses)}`} icon={Wallet} />

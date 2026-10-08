@@ -66,7 +66,7 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-ink/20 backdrop-blur-[2px]" />
-          <Dialog.Content className="fixed left-1/2 top-[10vh] z-50 w-[calc(100%-1.5rem)] max-w-2xl -translate-x-1/2 overflow-hidden rounded-3xl border border-line bg-surface shadow-lift outline-none data-[state=open]:animate-fade-up">
+          <Dialog.Content className="fixed left-1/2 top-[10vh] z-50 w-[calc(100%-1.5rem)] max-w-2xl -translate-x-1/2 overflow-hidden rounded-3xl border border-line bg-surface shadow-lift outline-none data-[state=open]:animate-pop">
             <Dialog.Title className="sr-only">Recherche globale</Dialog.Title>
             <Dialog.Description className="sr-only">Rechercher dans toute l’application</Dialog.Description>
             <div className="flex items-center gap-3 border-b border-line px-5">

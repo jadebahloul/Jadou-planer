@@ -2,6 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
 import { prisma } from './db';
+import { seedIfNeeded } from './seed';
 
 const COOKIE = 'jadou_session';
 const SESSION_DAYS = 30;
@@ -23,6 +24,7 @@ export async function setup(req: Request, res: Response) {
   const { name, password } = req.body ?? {};
   if (typeof password !== 'string' || password.length < 6) return res.status(400).json({ error: 'Mot de passe : 6 caractères minimum' });
   const user = await prisma.user.create({ data: { name: String(name || 'Jadou').slice(0, 60), passwordHash: await bcrypt.hash(password, 12) } });
+  await seedIfNeeded();
   await createSession(res, user.id);
   res.json({ ok: true });
 }
