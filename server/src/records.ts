@@ -69,6 +69,7 @@ async function beforeSave(resource: string, data: Row, prev: Row | null) {
       if (!prev && input0(data.durationMin) && svc.durationMin) data.durationMin = svc.durationMin;
     }
   }
+  if (resource === 'toeicExam' && merged.listening != null && merged.reading != null && (data.listening !== undefined || data.reading !== undefined)) data.total = merged.listening + merged.reading;
   if (resource === 'wishlistItem' && data.status === 'purchased' && !merged.purchasedAt) data.purchasedAt = today();
   if (resource === 'goal' && Array.isArray(safeJson(merged.steps)) && safeJson(merged.steps).length) {
     const steps = safeJson(merged.steps) as { done?: boolean }[];
